@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Modifica Buono</title>
+</head>
+
+<body>
+    <div style="text-align: right; margin-top: 20px; ">
+        <a href="../" class="header-button">Home</a>
+    </div>
+
+    <div class="rounded-box">
+        <h1>Modifica Buono</h1>
+        <form id="editVoucherForm">
+            <label for="type">Tipo:</label>
+            <select id="type" name="type" required>
+                <option value="CINEMA">Cinema</option>
+                <option value="MUSIC">Musica</option>
+                <option value="CONCERT">Concerto</option>
+                <option value="CULTURE_EVENT">Evento Culturale</option>
+                <option value="BOOK">Libro</option>
+                <option value="MUSEUM">Museo</option>
+                <option value="MUSICAL_INSTRUMENT">Strumento Musicale</option>
+                <option value="THEATER">Teatro</option>
+                <option value="DANCE">Danza</option>
+            </select>
+            <button type="submit">Salva Modifiche</button>
+        </form>
+    </div>
+
+    <link rel="stylesheet" href="/client-web/styles/style.css">
+
+    <script src="/client-web/scripts/api.js"></script>
+
+    <script>
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            console.log('No userId found in localStorage. Redirecting to login.');
+            window.location.href = '../login/';
+        }
+
+        getUser(userId).catch(error => {
+            console.error('Stored userId is invalid. Redirecting to login.', error);
+            localStorage.removeItem('userId');
+            window.location.href = '../login/';
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const voucherId = urlParams.get('id');
+
+        if (!voucherId) {
+            console.log('No voucherId found in URL. Redirecting to dashboard.');
+            window.location.href = '../';
+        }
+
+        async function loadVoucherData(voucherId) {
+            const voucher = await getVoucher(voucherId);
+
+            if (!voucher) {
+                console.error('Voucher not found');
+                alert('Voucher not found. Redirecting to dashboard.');
+                window.location.href = '../';
+                return;
+            }
+
+            return voucher;
+        }
+
+        loadVoucherData(voucherId).then(voucher => {
+            document.getElementById('type').value = voucher.type;
+
+            document.getElementById('editVoucherForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const type = document.getElementById('type').value;
+
+                try {
+                    const updatedVoucher = await updateVoucher(voucherId, type);
+                    window.location.href = '../';
+                } catch (error) {
+                    console.error('Error updating voucher:', error);
+                    alert('Errore durante l\'aggiornamento del buono. Riprova.');
+                }
+            });
+
+        }).catch(error => {
+            console.error('Error loading voucher data:', error);
+            alert('Errore durante il caricamento dei dati del buono. Riprova.');
+        });
+    </script>
+</body>
+
+</html>

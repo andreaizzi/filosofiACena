@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div style="text-align: right; margin-top: 20px; ">
+        <a href="../admin/" class="header-button">Admin</a>
+        <a href="../logout/" class="header-button">Logout</a>
+    </div>
+
+    <div style="text-align: center; margin-top: 100px; width: 80%; margin: auto;">
+        <div id="welcomeMessage" class="rounded-box"></div>
+        <div id="moneyLeftIndicator" class="rounded-box"></div>
+        <div id="vouchersStats" class="rounded-box">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <a href="vouchers/" class="header-button">Vedi buoni</a>
+            </div>
+        </div>
+        <div id="notConsumedVouchersTable" class="rounded-box">
+            <p>Buoni non utilizzati:</p>
+        </div>
+        <div id="consumedVouchersTable" class="rounded-box">
+            <p>Buoni utilizzati:</p>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/client-web/styles/style.css">
+
+    <script src="/client-web/scripts/api.js"></script>
+    <script src="/client-web/scripts/elements.js"></script>
+
+    <script>
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            console.log('No userId found in localStorage. Redirecting to login.');
+            window.location.href = '../login/';
+        }
+
+        getUser(userId).catch(error => {
+            console.error('Stored userId is invalid. Redirecting to login.', error);
+            localStorage.removeItem('userId');
+            window.location.href = '../login/';
+        });
+
+        async function loadDashboardData(userId) {
+            const user = await getUser(userId);
+            const vouchers = await getVouchersForUser(userId);
+
+            return {
+                user,
+                vouchers
+            };
+        }
+
+        loadDashboardData(userId).then(dashboardData => {
+            const { user, vouchers } = dashboardData;
+
+            vouchers.sort((a, b) => {
+                const dateA = new Date(a.creationDate.replace('[UTC]', ''));
+                const dateB = new Date(b.creationDate.replace('[UTC]', ''));
+                return dateB - dateA;
+            });
+
+            const notConsumedVouchers = vouchers.filter(voucher => !voucher.used);
+            const consumedVouchers = vouchers.filter(voucher => voucher.used);
+
+            document.title = `Dashboard - ${user.name}`;
+
+            const welcomeMessage = document.createElement('h1');
+            welcomeMessage.textContent = `Ciao, ${user.name}!`;
+            document.getElementById('welcomeMessage').appendChild(welcomeMessage);
+
+            const moneyLeft = user.moneyLeft;
+            const unused = notConsumedVouchers.reduce((acc, voucher) => acc + voucher.value, 0);
+            const used = consumedVouchers.reduce((acc, voucher) => acc + voucher.value, 0);
+
+            const total = moneyLeft + unused + used;
+
+            const indicatorContainer = document.getElementById('moneyLeftIndicator');
+
+            const splittedBar = createSplittedBar([
+                {
+                    caption: 'Disponibili (€' + moneyLeft.toFixed(2) + ' su €' + total.toFixed(2) + ')',
+                    width: moneyLeft / total,
+                    color: 'var(--primary-color)'
+                },
+            ], 'var(--secondary-color)');
+            indicatorContainer.appendChild(splittedBar);
+
+            const createVoucherButton = document.createElement('a');
+            createVoucherButton.textContent = '+';
+            createVoucherButton.href = 'create-voucher/';
+            createVoucherButton.className = 'circular-button';
+            createVoucherButton.style.marginTop = '20px';
+
+            indicatorContainer.appendChild(createVoucherButton);
+
+            const vouchersStatsContainer = document.getElementById('vouchersStats');
+            const usedStatsBar = createSplittedBar([
+                {
+                    caption: 'Buoni utilizzati (€' + used.toFixed(2) + ' su €' + (used + unused).toFixed(2) + ' generati)',
+                    width: used / (used + unused),
+                    color: 'var(--accent-color)'
+                },
+                {
+                    caption: 'Buoni non utilizzati (€' + unused.toFixed(2) + ' su €' + (used + unused).toFixed(2) + ' generati)',
+                    width: unused / (used + unused),
+                    color: 'var(--primary-color)'
+                }
+            ], 'var(--secondary-color)');
+
+            vouchersStatsContainer.appendChild(usedStatsBar);
+
+            const notConsumedVouchersTable = createNotConsumedVouchersTable(notConsumedVouchers);
+            document.getElementById('notConsumedVouchersTable').appendChild(notConsumedVouchersTable);
+
+            const consumedVouchersTable = createConsumedVouchersTable(consumedVouchers);
+            document.getElementById('consumedVouchersTable').appendChild(consumedVouchersTable);
+
+        }).catch(error => {
+            console.error('Error fetching dashboard data:', error);
+        });
+    </script>
+</body>
+
+</html>

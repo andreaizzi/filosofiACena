@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="rounded-box">
+        <form id="loginForm">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" name="userId" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div class="rounded-box">
+        <a href="../signin/" class="header-button">Registrati</a>
+    </div>
+
+    <link rel="stylesheet" href="/client-web/styles/style.css">
+
+    <script src="/client-web/scripts/api.js"></script>
+
+    <script>
+        const storedUserId = localStorage.getItem('userId');
+
+        if (storedUserId) {
+            getUser(storedUserId).then(user => {
+                window.location.href = '../dashboard/';
+            }).catch(error => {
+                localStorage.removeItem('userId');
+                console.error('Stored userId is invalid. Removing from localStorage.', error);
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const userId = document.getElementById('userId').value;
+
+            if (!userId) {
+                alert('Inserisci un ID utente valido.');
+                return;
+            }
+
+            getUser(userId).then(user => {
+                localStorage.setItem('userId', user.id);
+                window.location.href = '../dashboard';
+            }).catch(error => {
+                alert('Utente non trovato. Controlla l\'ID utente.');
+            });
+        });
+    </script>
+</body>
+
+</html>

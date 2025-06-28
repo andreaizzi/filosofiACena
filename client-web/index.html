@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Reindirizzamento...</title>
+</head>
+
+<body>
+  <h1>Reindirizzamento...</h1>
+  <p>Clicca <a href="login/">qui</a> per essere reindirizzato alla pagina di login...</p>
+  <script>
+    const userId = localStorage.getItem('userId');
+
+    if (userId) {
+      window.location.href = 'dashboard/';
+    } else {
+      window.location.href = 'login/';
+    }
+  </script>
+</body>
+
+</html>

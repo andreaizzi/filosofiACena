@@ -1,0 +1,3 @@
+.DS_Store
+database/target/*
+server-web/target/*

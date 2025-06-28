@@ -1,0 +1,64 @@
+{
+  "vouchers": {
+    "id": "vouchers",
+    "documents": {
+      "feb9b847-bfb1-4585-a480-7655f362b2ac": {
+        "id": "feb9b847-bfb1-4585-a480-7655f362b2ac",
+        "content": "{\"creationDate\":\"2025-06-08T13:07:28.429Z[UTC]\",\"id\":\"feb9b847-bfb1-4585-a480-7655f362b2ac\",\"type\":\"MUSICAL_INSTRUMENT\",\"used\":false,\"userId\":\"8a785460-3531-41fb-8bef-7179be20afd4\",\"value\":320}"
+      },
+      "336a4aaf-b925-4bd0-adc7-2566bab68cb9": {
+        "id": "336a4aaf-b925-4bd0-adc7-2566bab68cb9",
+        "content": "{\"consumeDate\":\"2025-06-28T13:18:58.819Z[UTC]\",\"creationDate\":\"2025-06-28T13:18:52.278Z[UTC]\",\"id\":\"336a4aaf-b925-4bd0-adc7-2566bab68cb9\",\"type\":\"CULTURE_EVENT\",\"used\":true,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":100}"
+      },
+      "a816f379-27dc-433c-a9a3-52fbc53003f9": {
+        "id": "a816f379-27dc-433c-a9a3-52fbc53003f9",
+        "content": "{\"creationDate\":\"2025-06-23T13:19:30.529Z[UTC]\",\"id\":\"a816f379-27dc-433c-a9a3-52fbc53003f9\",\"type\":\"BOOK\",\"used\":false,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":50}"
+      },
+      "553b9769-fc03-4401-be26-43da0e5a2127": {
+        "id": "553b9769-fc03-4401-be26-43da0e5a2127",
+        "content": "{\"consumeDate\":\"2025-06-28T13:19:21.816Z[UTC]\",\"creationDate\":\"2025-06-28T13:19:17.595Z[UTC]\",\"id\":\"553b9769-fc03-4401-be26-43da0e5a2127\",\"type\":\"CULTURE_EVENT\",\"used\":true,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":20}"
+      },
+      "623334d7-c44f-4f6c-b06b-3f9071906e37": {
+        "id": "623334d7-c44f-4f6c-b06b-3f9071906e37",
+        "content": "{\"creationDate\":\"2025-06-21T13:19:47.009Z[UTC]\",\"id\":\"623334d7-c44f-4f6c-b06b-3f9071906e37\",\"type\":\"MUSIC\",\"used\":false,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":55}"
+      },
+      "7fee5295-4cfb-4741-b07b-67ad8bd4a4ac": {
+        "id": "7fee5295-4cfb-4741-b07b-67ad8bd4a4ac",
+        "content": "{\"creationDate\":\"2025-06-08T13:06:36.077Z[UTC]\",\"id\":\"7fee5295-4cfb-4741-b07b-67ad8bd4a4ac\",\"type\":\"CINEMA\",\"used\":false,\"userId\":\"97e4fee4-4e79-4f28-9725-f199c6e6ecf0\",\"value\":500}"
+      },
+      "8e0304f8-abef-4397-8708-c2a7b3f4d3b5": {
+        "id": "8e0304f8-abef-4397-8708-c2a7b3f4d3b5",
+        "content": "{\"creationDate\":\"2025-06-11T13:19:05.862Z[UTC]\",\"id\":\"8e0304f8-abef-4397-8708-c2a7b3f4d3b5\",\"type\":\"MUSICAL_INSTRUMENT\",\"used\":false,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":70}"
+      },
+      "1e49011f-bb96-4bd5-a55b-64690deaa5c4": {
+        "id": "1e49011f-bb96-4bd5-a55b-64690deaa5c4",
+        "content": "{\"consumeDate\":\"2025-06-28T13:19:52.955Z[UTC]\",\"creationDate\":\"2025-06-21T13:19:38.659Z[UTC]\",\"id\":\"1e49011f-bb96-4bd5-a55b-64690deaa5c4\",\"type\":\"THEATER\",\"used\":true,\"userId\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"value\":90}"
+      },
+      "cc0b7b3d-c269-42e5-b39c-3ecd67f6b23f": {
+        "id": "cc0b7b3d-c269-42e5-b39c-3ecd67f6b23f",
+        "content": "{\"creationDate\":\"2025-06-08T13:07:18.133Z[UTC]\",\"id\":\"cc0b7b3d-c269-42e5-b39c-3ecd67f6b23f\",\"type\":\"THEATER\",\"used\":false,\"userId\":\"8a785460-3531-41fb-8bef-7179be20afd4\",\"value\":170}"
+      }
+    }
+  },
+  "users": {
+    "id": "users",
+    "documents": {
+      "97e4fee4-4e79-4f28-9725-f199c6e6ecf0": {
+        "id": "97e4fee4-4e79-4f28-9725-f199c6e6ecf0",
+        "content": "{\"cf\":\"LVRFDR\",\"email\":\"olivierifederico@mail.com\",\"id\":\"97e4fee4-4e79-4f28-9725-f199c6e6ecf0\",\"moneyLeft\":0,\"name\":\"Federico\",\"surname\":\"Olivieri\"}"
+      },
+      "8a785460-3531-41fb-8bef-7179be20afd4": {
+        "id": "8a785460-3531-41fb-8bef-7179be20afd4",
+        "content": "{\"cf\":\"DFLNDR\",\"email\":\"defilippiandrea@mail.com\",\"id\":\"8a785460-3531-41fb-8bef-7179be20afd4\",\"moneyLeft\":10,\"name\":\"Andrea\",\"surname\":\"De Filippi\"}"
+      },
+      "b95ad1ed-bea6-419e-87b5-9f60340bc74b": {
+        "id": "b95ad1ed-bea6-419e-87b5-9f60340bc74b",
+        "content": "{\"cf\":\"MRCNCC\",\"email\":\"moriconiniccolò@mail.com\",\"id\":\"b95ad1ed-bea6-419e-87b5-9f60340bc74b\",\"moneyLeft\":115,\"name\":\"Niccolò\",\"surname\":\"Moriconi\"}"
+      },
+      "5af39a5d-e71b-4ff6-ae0d-28ee7372b77e": {
+        "id": "5af39a5d-e71b-4ff6-ae0d-28ee7372b77e",
+        "content": "{\"cf\":\"HRNNLL\",\"email\":\"horanniall@mail.com\",\"id\":\"5af39a5d-e71b-4ff6-ae0d-28ee7372b77e\",\"moneyLeft\":500,\"name\":\"Niall\",\"surname\":\"Horan\"}"
+      }
+    }
+  }
+}

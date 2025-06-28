@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Crea Buono</title>
+</head>
+
+<body>
+    <!-- Home button -->
+    <div style="text-align: right; margin-top: 20px; ">
+        <a href="../" class="header-button">Home</a>
+    </div>
+
+    <div class="rounded-box">
+        <h1>Crea Buono</h1>
+        <form id="createVoucherForm">
+            <label for="value">Valore:</label>
+            <input type="number" id="value" name="value" required>
+            <label for="type">Tipo:</label>
+            <select id="type" name="type" required>
+                <option value="CINEMA">Cinema</option>
+                <option value="MUSIC">Musica</option>
+                <option value="CONCERT">Concerto</option>
+                <option value="CULTURE_EVENT">Evento Culturale</option>
+                <option value="BOOK">Libro</option>
+                <option value="MUSEUM">Museo</option>
+                <option value="MUSICAL_INSTRUMENT">Strumento Musicale</option>
+                <option value="THEATER">Teatro</option>
+                <option value="DANCE">Danza</option>
+            </select>
+            <button type="submit">Crea Buono</button>
+        </form>
+    </div>
+
+    <link rel="stylesheet" href="/client-web/styles/style.css">
+
+    <script src="/client-web/scripts/api.js"></script>
+
+    <script>
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            console.log('No userId found in localStorage. Redirecting to login.');
+            window.location.href = '../login/';
+        }
+
+        getUser(userId).catch(error => {
+            console.error('Stored userId is invalid. Redirecting to login.', error);
+            localStorage.removeItem('userId');
+            window.location.href = '../login/';
+        });
+
+        document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const value = document.getElementById('value').value;
+            const type = document.getElementById('type').value;
+
+            try {
+                const voucher = await createVoucher(userId, value, type);
+                alert('Buono creato con successo!');
+                window.location.href = '../';
+            } catch (error) {
+                console.error('Error creating voucher:', error);
+                alert('Errore durante la creazione del buono. Riprova.');
+            }
+        });
+
+    </script>
+</body>
+
+</html>

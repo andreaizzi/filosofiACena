@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard Amministratori</title>
+</head>
+
+<body>
+    <div style="text-align: right; margin-top: 20px; ">
+        <a href="../index.html" class="header-button">Dashboard</a>
+    </div>
+
+    <link rel="stylesheet" href="/client-web/styles/style.css">
+
+    <script src="/client-web/scripts/api.js"></script>
+    <script src="/client-web/scripts/elements.js"></script>
+
+    <script>
+        async function fetchData() {
+            const users = await getUsers();
+            const vouchers = await getVouchers();
+
+            return { users, vouchers };
+        }
+
+        fetchData().then(data => {
+            const { users, vouchers } = data;
+
+            const usedVouchers = vouchers.filter(v => v.used);
+            const unusedVouchers = vouchers.filter(v => !v.used);
+
+            // Numero totale degli utenti
+            const totUsers = users.length;
+
+            const usersDiv = document.createElement("div");
+            usersDiv.classList.add("rounded-box");
+            usersDiv.id = "usersStats";
+
+            const text = document.createElement("h3");
+            text.innerText = "Utenti registrati: " + users.length;
+            usersDiv.appendChild(text);
+
+            document.body.appendChild(usersDiv);
+
+            // Somma dei contributi divisa in
+            const totAmount = totUsers * 500;
+            // porzione assegnata e non consumata
+            const unusedAmount = unusedVouchers.reduce((acc, v) => acc + v.value, 0);
+            // porzione consumata
+            const usedAmount = usedVouchers.reduce((acc, v) => acc + v.value, 0);
+            // porzione disponibile
+            const availableAmount = totAmount - usedAmount - unusedAmount;
+
+            const vouchersDiv = document.createElement("div");
+            vouchersDiv.classList.add("rounded-box");
+            vouchersDiv.id = "vouchersStats";
+
+            const splitDiv = createSplittedBar([{
+                caption: "Usati (€" + usedAmount + " su €" + (unusedAmount + usedAmount) + " generati)",
+                width: usedAmount / totAmount,
+                color: 'var(--accent-color)',
+            }, {
+                caption: "Non usati (€" + unusedAmount + " su €" + (unusedAmount + usedAmount) + " generati)",
+                width: unusedAmount / totAmount,
+                color: 'var(--primary-color)',
+            }, {
+                caption: "Disponibili (€" + availableAmount + " su €" + totAmount + " totali)",
+                width: availableAmount / totAmount,
+                color: 'var(--secondary-color)',
+            }]);
+            vouchersDiv.appendChild(splitDiv);
+            document.body.appendChild(vouchersDiv);
+
+            // Testo con il numero di voucher
+            const numVouchersDiv = document.createElement("div");
+            numVouchersDiv.classList.add("rounded-box");
+
+            const textVouchers = document.createElement("h3");
+            textVouchers.innerText = "Vouchers generati: " + vouchers.length +
+                " (usati: " + usedVouchers.length +
+                ", non usati: " + unusedVouchers.length + ")";
+
+            numVouchersDiv.appendChild(textVouchers);
+            document.body.appendChild(numVouchersDiv);
+
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add("rounded-box");
+            errorDiv.innerText = "Errore durante il caricamento dei dati: " + error.message;
+            document.body.appendChild(errorDiv);
+        });
+    </script>
+</body>
+
+</html>
