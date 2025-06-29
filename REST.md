@@ -21,7 +21,7 @@ L'API esposta dal server contiene i seguenti endpoints:
 
 ### Spiegazione dettagliata degli endpoints
 
-- **GET `/users/{userId}`**  
+- **GET `/users`**  
     Restituisce la lista di tutti gli utenti.  
 
     È possibile filtrare gli utenti per nome, cognome o codice fiscale, specificando i parametri `name`, `surname`, `email` o `cf` nella query string. Se non viene specificato alcun filtro, vengono restituiti tutti gli utenti.

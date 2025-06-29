@@ -21,7 +21,19 @@ Le tre classi che gestiscono il database sono `Database`, `Collection` e `Docume
 ---
 
 ### Protocol Info
-Il protocollo implementato è di tipo testuale. I comandi accettati sono
+Il protocollo implementato è di tipo testuale. 
+Il formato della richiesta è il seguente:
+
+```
+<command> <collectionName> [<documentId>] [<documentData>]
+```
+Dove:
+- `<command>` è il comando da eseguire
+- `<collectionName>` è il nome della collezione su cui eseguire il comando
+- `<documentId>` è l'ID del documento su cui eseguire il comando (solo per i comandi che lo richiedono)
+- `<documentData>` è il contenuto del documento (solo per i comandi che lo richiedono)
+
+I comandi accettati sono:
 
 `GET collectionName`
 - Intera collezione

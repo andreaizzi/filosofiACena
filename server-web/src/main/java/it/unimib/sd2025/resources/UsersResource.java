@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import it.unimib.sd2025.models.User;
+import it.unimib.sd2025.models.Voucher;
 import it.unimib.sd2025.utils.DatabaseConnection;
 import it.unimib.sd2025.utils.DatabaseException;
 import jakarta.ws.rs.Consumes;
@@ -26,6 +27,13 @@ public class UsersResource {
 
     private final DatabaseConnection databaseConnection = new DatabaseConnection("localhost", 3030);
 
+    /**
+     * Retrieves a list of users, optionally filtered by query parameters.
+     * Filtering can be done by name, surname, email, or CF (Codice Fiscale).
+     *
+     * @param uriInfo The URI information containing query parameters.
+     * @return A response containing the list of users or an error message.
+     */
     @GET
     @Produces("application/json")
     public Response getUsers(@Context UriInfo uriInfo) {
@@ -60,11 +68,17 @@ public class UsersResource {
             return Response.ok(filteredUsers).build();
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
-                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .entity(e.getMessage())
                     .build();
         }
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param userId The ID of the user to retrieve.
+     * @return A response containing the user or an error message.
+     */
     @GET
     @Path("/{userId}")
     @Produces("application/json")
@@ -75,11 +89,19 @@ public class UsersResource {
             return Response.ok(user).build();
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
-                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .entity(e.getMessage())
                     .build();
         }
     }
 
+    /**
+     * Updates a user by their ID with the provided updates. Updates can be done
+     * on name, surname, email, and CF (Codice Fiscale).
+     *
+     * @param userId The ID of the user to update.
+     * @param updates A map containing the fields to update.
+     * @return A response indicating the success or failure of the operation.
+     */
     @PUT
     @Path("/{userId}")
     @Consumes("application/json")
@@ -95,7 +117,14 @@ public class UsersResource {
                 existingUser.setSurname(updates.get("surname"));
             }
             if (updates.containsKey("email")) {
-                existingUser.setEmail(updates.get("email"));
+                String email = updates.get("email");
+                if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Email non valida")
+                            .build();
+                }
+
+                existingUser.setEmail(email);
             }
             if (updates.containsKey("cf")) {
                 existingUser.setCf(updates.get("cf"));
@@ -107,11 +136,18 @@ public class UsersResource {
 
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
-                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .entity(e.getMessage())
                     .build();
         }
     }
 
+    /**
+     * Creates a new user with the provided details. The user is initialized
+     * with a default amount of money (500).
+     *
+     * @param user The user object containing the details to create.
+     * @return A response indicating the success or failure of the operation.
+     */
     @POST
     @Consumes("application/json")
     @Produces("application/json")
@@ -119,25 +155,32 @@ public class UsersResource {
         try {
             if (user.getName() == null || user.getName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Name is required\"}")
+                        .entity("Il nome è obbligatorio")
                         .build();
             }
 
             if (user.getSurname() == null || user.getSurname().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Surname is required\"}")
+                        .entity("Il cognome è obbligatorio")
                         .build();
             }
 
             if (user.getEmail() == null || user.getEmail().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Email is required\"}")
+                        .entity("L'email è obbligatoria")
+                        .build();
+            }
+
+            String email = user.getEmail();
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Email non valida")
                         .build();
             }
 
             if (user.getCf() == null || user.getCf().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"CF is required\"}")
+                        .entity("Il CF è obbligatorio")
                         .build();
             }
 
@@ -152,21 +195,41 @@ public class UsersResource {
                     .build();
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
-                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .entity(e.getMessage())
                     .build();
         }
     }
 
+    /**
+     * Deletes a user by their ID. This operation also deletes all vouchers
+     * associated with the user.
+     *
+     * @param userId The ID of the user to delete.
+     * @return A response indicating the success or failure of the operation.
+     */
     @DELETE
     @Path("/{userId}")
     @Produces("application/json")
     public Response deleteUser(@PathParam("userId") String userId) {
         try {
+            User user = databaseConnection.getDocument("users", userId, User.class);
+
+            Voucher[] vouchers = databaseConnection.getCollection("vouchers", Voucher[].class);
+
+            for (Voucher voucher : vouchers) {
+                if (voucher.getUserId().equals(user.getId())) {
+                    databaseConnection.deleteDocument("vouchers", voucher.getId());
+                }
+            }
+
             databaseConnection.deleteDocument("users", userId);
-            return Response.noContent().build();
+
+            return Response.status(Response.Status.NO_CONTENT)
+                    .entity("Utente eliminato con successo")
+                    .build();
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
-                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .entity(e.getMessage())
                     .build();
         }
     }

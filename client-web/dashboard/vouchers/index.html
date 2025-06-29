@@ -14,10 +14,10 @@
     <div class="rounded-box" id="vouchersList">
     </div>
 
-    <link rel="stylesheet" href="/client-web/styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 
-    <script src="/client-web/scripts/api.js"></script>
-    <script src="/client-web/scripts/elements.js"></script>
+    <script src="/scripts/api.js"></script>
+    <script src="/scripts/elements.js"></script>
 
     <script>
         const userId = localStorage.getItem('userId');
@@ -49,6 +49,8 @@
                     }
                 }).catch(error => {
                     console.error('Error fetching vouchers:', error);
+                    alert(error.message || 'Si è verificato un errore durante il caricamento dei buoni. Riprova più tardi.');
+                    window.location.href = '../login/';
                 });
             })
             .catch(error => {

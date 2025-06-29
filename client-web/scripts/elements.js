@@ -155,7 +155,7 @@ function createNotConsumedVouchersTable(vouchers) {
                     })
                     .catch(error => {
                         console.error('Error consuming voucher:', error);
-                        alert('Buono non consumato. Riprova più tardi.');
+                        alert(error.message || 'Impossibile utilizzare il buono. Riprova più tardi.');
                     });
             }
         };
@@ -173,7 +173,7 @@ function createNotConsumedVouchersTable(vouchers) {
                     })
                     .catch(error => {
                         console.error('Error deleting voucher:', error);
-                        alert('Impossibile eliminare il buono. Riprova più tardi.');
+                        alert(error.message || 'Impossibile eliminare il buono. Riprova più tardi.');
                     });
             };
         };

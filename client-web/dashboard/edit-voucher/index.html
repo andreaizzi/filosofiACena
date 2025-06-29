@@ -29,9 +29,9 @@
         </form>
     </div>
 
-    <link rel="stylesheet" href="/client-web/styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 
-    <script src="/client-web/scripts/api.js"></script>
+    <script src="/scripts/api.js"></script>
 
     <script>
         const userId = localStorage.getItem('userId');
@@ -55,20 +55,7 @@
             window.location.href = '../';
         }
 
-        async function loadVoucherData(voucherId) {
-            const voucher = await getVoucher(voucherId);
-
-            if (!voucher) {
-                console.error('Voucher not found');
-                alert('Voucher not found. Redirecting to dashboard.');
-                window.location.href = '../';
-                return;
-            }
-
-            return voucher;
-        }
-
-        loadVoucherData(voucherId).then(voucher => {
+        getVoucher(voucherId).then(voucher => {
             document.getElementById('type').value = voucher.type;
 
             document.getElementById('editVoucherForm').addEventListener('submit', async (event) => {
@@ -81,13 +68,14 @@
                     window.location.href = '../';
                 } catch (error) {
                     console.error('Error updating voucher:', error);
-                    alert('Errore durante l\'aggiornamento del buono. Riprova.');
+                    alert(error.message || 'Errore durante l\'aggiornamento del buono. Riprova più tardi.');
                 }
             });
 
         }).catch(error => {
-            console.error('Error loading voucher data:', error);
-            alert('Errore durante il caricamento dei dati del buono. Riprova.');
+            console.error('Error fetching voucher:', error);
+            alert(error.message || 'Errore durante il caricamento dei dati del buono. Riprova più tardi.');
+            window.location.href = '../';
         });
     </script>
 </body>

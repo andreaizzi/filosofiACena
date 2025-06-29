@@ -18,9 +18,9 @@
         <a href="../signin/" class="header-button">Registrati</a>
     </div>
 
-    <link rel="stylesheet" href="/client-web/styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 
-    <script src="/client-web/scripts/api.js"></script>
+    <script src="/scripts/api.js"></script>
 
     <script>
         const storedUserId = localStorage.getItem('userId');
@@ -48,7 +48,7 @@
                 localStorage.setItem('userId', user.id);
                 window.location.href = '../dashboard';
             }).catch(error => {
-                alert('Utente non trovato. Controlla l\'ID utente.');
+                alert(error.message || 'Si è verificato un errore durante il login. Riprova più tardi.');
             });
         });
     </script>

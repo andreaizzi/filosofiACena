@@ -21,9 +21,9 @@
         </form>
     </div>
 
-    <link rel="stylesheet" href="/client-web/styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 
-    <script src="/client-web/scripts/api.js"></script>
+    <script src="/scripts/api.js"></script>
 
     <script>
         const storedUserId = localStorage.getItem('userId');
@@ -51,7 +51,7 @@
                 window.location.href = '../login/';
             } catch (error) {
                 console.error('Error creating user:', error);
-                alert('Si è verificato un errore durante la registrazione. Riprova.');
+                alert(error.message || 'Si è verificato un errore durante la registrazione. Riprova più tardi.');
             }
         });
     </script>

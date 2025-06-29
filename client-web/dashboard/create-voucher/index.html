@@ -32,9 +32,9 @@
         </form>
     </div>
 
-    <link rel="stylesheet" href="/client-web/styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
 
-    <script src="/client-web/scripts/api.js"></script>
+    <script src="/scripts/api.js"></script>
 
     <script>
         const userId = localStorage.getItem('userId');
@@ -62,7 +62,7 @@
                 window.location.href = '../';
             } catch (error) {
                 console.error('Error creating voucher:', error);
-                alert('Errore durante la creazione del buono. Riprova.');
+                alert(error.message || 'Si è verificato un errore durante la creazione del buono. Riprova più tardi.');
             }
         });
 

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import it.unimib.sd2025.models.User;
 import it.unimib.sd2025.models.Voucher;
@@ -28,6 +29,15 @@ public class VouchersResource {
 
     private final DatabaseConnection databaseConnection = new DatabaseConnection("localhost", 3030);
 
+    private final ConcurrentHashMap<String, Object> userLocks = new ConcurrentHashMap<>();
+
+    /**
+     * Retrieves a list of vouchers based on query parameters. Allows filtering
+     * by userId, type, and used status.
+     *
+     * @param uriInfo the URI information containing query parameters
+     * @return a Response containing the list of vouchers or an error message
+     */
     @GET
     @Produces("application/json")
     public Response getVouchers(@Context UriInfo uriInfo) {
@@ -67,6 +77,12 @@ public class VouchersResource {
         }
     }
 
+    /**
+     * Retrieves a voucher by its ID.
+     *
+     * @param voucherId the ID of the voucher to retrieve
+     * @return a Response containing the voucher or an error message
+     */
     @GET
     @Path("/{voucherId}")
     @Produces("application/json")
@@ -82,6 +98,16 @@ public class VouchersResource {
         }
     }
 
+    /**
+     * Updates a voucher by its ID. Allows updating the type and used status of
+     * the voucher. If the voucher is already used, it cannot be updated. If the
+     * used status is set to true, the consume date is also set to the current
+     * date.
+     *
+     * @param voucherId the ID of the voucher to update
+     * @param updates a map containing the fields to update
+     * @return a Response indicating success or failure
+     */
     @PUT
     @Path("/{voucherId}")
     @Consumes("application/json")
@@ -92,7 +118,7 @@ public class VouchersResource {
 
             if (existingVoucher.isUsed()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Cannot update a used voucher")
+                        .entity("Impossibile aggiornare un buono già utilizzato")
                         .build();
             }
 
@@ -115,6 +141,13 @@ public class VouchersResource {
         }
     }
 
+    /**
+     * Creates a new voucher. Requires userId, value, and type parameters. The
+     * value must be a positive integer and the user must have sufficient funds.
+     *
+     * @param voucherData a map containing the voucher data
+     * @return a Response indicating success or failure
+     */
     @POST
     @Consumes("application/json")
     @Produces("application/json")
@@ -124,63 +157,67 @@ public class VouchersResource {
 
             if (!voucherData.containsKey("userId") || !voucherData.containsKey("value") || !voucherData.containsKey("type")) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Missing required parameters: userId, value, type")
+                        .entity("userId, value e type sono obbligatori")
                         .build();
             }
 
             String userId = voucherData.get("userId");
-            User user = databaseConnection.getDocument("users", userId, User.class);
 
-            int value;
+            Object userLock = userLocks.computeIfAbsent(userId, k -> new Object());
 
-            try {
-                value = Integer.parseInt(voucherData.get("value"));
-                if (value <= 0) {
+            synchronized (userLock) {
+                User user = databaseConnection.getDocument("users", userId, User.class);
+
+                int value;
+
+                try {
+                    value = Integer.parseInt(voucherData.get("value"));
+                    if (value <= 0) {
+                        return Response.status(Response.Status.BAD_REQUEST)
+                                .entity("Il valore deve essere un intero positivo")
+                                .build();
+                    }
+
+                    if (user.getMoneyLeft() < value) {
+                        return Response.status(Response.Status.BAD_REQUEST)
+                                .entity("Fondi insufficienti per l'utente")
+                                .build();
+                    }
+                } catch (NumberFormatException e) {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Value must be a positive integer")
+                            .entity("Valore non valido, deve essere un intero positivo")
                             .build();
                 }
 
-                if (user.getMoneyLeft() < value) {
+                voucher.setUserId(userId);
+                voucher.setValue(value);
+
+                String typeParam = voucherData.get("type");
+                Voucher.VoucherType type;
+
+                try {
+                    type = Voucher.VoucherType.fromString(typeParam);
+                    voucher.setType(type);
+                } catch (IllegalArgumentException e) {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Insufficient funds for user: " + userId)
+                            .entity("Tipo di buono non valido: " + typeParam)
                             .build();
                 }
-            } catch (NumberFormatException e) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Invalid value format")
+
+                String voucherId = UUID.randomUUID().toString();
+                voucher.setId(voucherId);
+                voucher.setCreationDate(new Date());
+                voucher.setUsed(false);
+
+                databaseConnection.createDocument("vouchers", voucherId, voucher);
+
+                user.setMoneyLeft(user.getMoneyLeft() - voucher.getValue());
+                databaseConnection.updateDocument("users", user.getId(), user);
+
+                return Response.status(Response.Status.CREATED)
+                        .entity(voucher)
                         .build();
             }
-
-            voucher.setUserId(userId);
-            voucher.setValue(value);
-
-            String typeParam = voucherData.get("type");
-            Voucher.VoucherType type;
-
-            try {
-                type = Voucher.VoucherType.fromString(typeParam);
-                voucher.setType(type);
-            } catch (IllegalArgumentException e) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Invalid voucher type: " + typeParam)
-                        .build();
-            }
-
-            String voucherId = UUID.randomUUID().toString();
-            voucher.setId(voucherId);
-            voucher.setCreationDate(new Date());
-            voucher.setUsed(false);
-
-            databaseConnection.createDocument("vouchers", voucherId, voucher);
-
-            user.setMoneyLeft(user.getMoneyLeft() - voucher.getValue());
-            databaseConnection.updateDocument("users", user.getId(), user);
-
-            return Response.status(Response.Status.CREATED)
-                    .entity(voucher)
-                    .build();
-
         } catch (DatabaseException e) {
             return Response.status(e.getErrorCode())
                     .entity(e.getMessage())
@@ -188,6 +225,14 @@ public class VouchersResource {
         }
     }
 
+    /**
+     * Deletes a voucher by its ID. If the voucher is already used, it cannot be
+     * deleted. The user's money is refunded if the voucher is successfully
+     * deleted.
+     *
+     * @param voucherId the ID of the voucher to delete
+     * @return a Response indicating success or failure
+     */
     @DELETE
     @Path("/{voucherId}")
     @Produces("application/json")
@@ -197,7 +242,7 @@ public class VouchersResource {
 
             if (existingVoucher.isUsed()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Cannot delete a used voucher")
+                        .entity("Impossibile eliminare un buono già utilizzato")
                         .build();
             }
 
@@ -208,7 +253,7 @@ public class VouchersResource {
             databaseConnection.updateDocument("users", user.getId(), user);
 
             return Response.status(Response.Status.NO_CONTENT)
-                    .entity("Voucher deleted successfully")
+                    .entity("Buono eliminato con successo")
                     .build();
 
         } catch (DatabaseException e) {

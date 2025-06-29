@@ -35,19 +35,6 @@ button {
     margin: 30px;
 }
 
-.progress-bar {
-    width: 100%;
-    background-color: var(--secondary-color);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 20px;
-    background-color: var(--primary-color);
-    width: 0;
-}
-
 .header-button {
     text-decoration: none;
     background-color: var(--primary-color);
